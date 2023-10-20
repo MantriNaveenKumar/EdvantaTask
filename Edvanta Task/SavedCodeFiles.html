@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <style>
+        #keysList li {
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top:5px;
+            padding: 5px;
+        }
+
+        #keysList li:hover {
+            color: red;
+        }
+    </style>
+</head>
+<body style="background-color: rgb(6, 15, 24);">
+    <h4 class="text-center bg-danger p-2 text-white mt-5">SAVED FILES HISTORY</h4>
+    <div class="container mt-5">
+        <div class="row text-center">
+            <div class="col-lg-4 mt-4 overflow-auto ">
+                <h4 class="text-secondary text-center">SAVED FILES</h4>
+
+                <ul class="file-list fs-6 overflow-auto bg-white mt-4" id="keysList">
+                    <!-- List of saved files will be displayed here -->
+                </ul>
+            </div>
+
+            <div class="col-lg-7 mt-4">
+                <h4 class="text-secondary text-center">OUTPUT</h4>
+
+                <textarea class="output-textarea overflow-auto bg-white mt-2 fs-6 p-4" style="height: 450px; width: 100%;" id="contentFrame"></textarea>
+
+                <!-- Edit and Save buttons for editing and saving content -->
+                <button class="btn btn-primary mt-2" id="editButton" style="height: 40px;width: 150px;">Edit</button>
+                <button class="btn btn-success mt-2" id="saveButton" style="display: none;height: 40px;width: 150px;">Save</button>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+
+    <script>
+        // Retrieve keys from local storage
+        const keys = Object.keys(localStorage);
+
+        // Get the <ul> element where we'll display the keys
+        const keysList = document.getElementById('keysList');
+        const contentFrame = document.getElementById('contentFrame');
+        const editButton = document.getElementById('editButton');
+        const saveButton = document.getElementById('saveButton');
+        let selectedKey = null;
+
+        //-- Modify the function to display content in the textarea -->
+        function displayContent(key) {
+            const content = localStorage.getItem(key);
+            contentFrame.value = content;
+            selectedKey = key;
+            contentFrame.readOnly = true;
+            editButton.style.display = 'block';
+            saveButton.style.display = 'none';
+        }
+
+        // Edit button click event
+        editButton.addEventListener('click', () => {
+            contentFrame.readOnly = false;
+            editButton.style.display = 'none';
+            saveButton.style.display = 'block';
+        });
+
+        // Save button click event
+        saveButton.addEventListener('click', () => {
+            const editedContent = contentFrame.value;
+            localStorage.setItem(selectedKey, editedContent);
+            contentFrame.readOnly = true;
+            editButton.style.display = 'block';
+            saveButton.style.display = 'none';
+        });
+
+        // Iterate through the keys and create <li> elements to display them
+        for (let i = 0; i < keys.length; i++) {
+            const key = keys[i];
+            const li = document.createElement('li');
+            li.textContent = key;
+
+            // Add a click event listener to each <li> to display content in the iframe
+            li.addEventListener('click', () => {
+                displayContent(key);
+            });
+
+
+            // Add a delete button to each <li>
+            const deleteButton = document.createElement('button');
+            deleteButton.textContent = 'Delete';
+            deleteButton.style.height = '40px';
+            deleteButton.style.width = '100px';
+
+            deleteButton.className = 'btn btn-danger btn-sm ml-2';
+            deleteButton.addEventListener('click', () => {
+                // Delete the file from local storage and remove the <li> from the list
+                localStorage.removeItem(key);
+                keysList.removeChild(li);
+            });
+
+            // Append the delete button to the LI element
+           
+            li.appendChild(deleteButton);
+            keysList.appendChild(li);
+        }
+    </script>
+</body>
+</html>
